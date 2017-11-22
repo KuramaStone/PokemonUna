@@ -82,6 +82,8 @@ public class PokeLoop {
 		Graphics bbg = backBuffer.getGraphics();
 
 		bbg.setColor(Color.WHITE);
+		bbg.setColor(Color.BLACK);
+		bbg.fillRect(0, 0, PokeLoop.WIDTH, PokeLoop.HEIGHT);
 
 		screen.render(bbg);
 

@@ -1,12 +1,10 @@
 package una.world;
 
-import java.awt.Color;
 import java.awt.Graphics;
 
 import una.engine.PokeLoop;
 import una.engine.TileRenderer;
 import una.entity.Player;
-import una.pokemon.Pokemon;
 import una.toolbox.Tools;
 
 public class Screen {
@@ -36,11 +34,8 @@ public class Screen {
 			specAreas = Tools.loadConnections(id);
 		}
 	}
-	Pokemon poke = new Pokemon(7, null);
 
 	public void render(Graphics g) {
-		g.setColor(Color.BLACK);
-		g.fillRect(0, 0, PokeLoop.WIDTH, PokeLoop.HEIGHT);
 		for(PokeArea spec : specAreas) {
 			if(spec != null) {
 				tileR.render(g, spec, spec.getMapX(), spec.getMapY());
@@ -49,7 +44,6 @@ public class Screen {
 		tileR.render(g, currentArea, currentArea.getMapX(), currentArea.getMapY());
 
 		player.render(g);
-		g.drawImage(poke.getBack(), 0, 0, null);
 	}
 
 	public void tick() {

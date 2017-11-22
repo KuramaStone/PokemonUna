@@ -1,12 +1,16 @@
 package una.entity;
 
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import una.engine.PokeLoop;
 import una.input.InputHandler;
+import una.pokemon.Pokemon;
+import una.tiles.Tile;
 import una.toolbox.Sprites;
 import una.world.PokeArea;
 import una.world.Screen;
@@ -24,15 +28,12 @@ public class Player extends Entity {
 		input = loop.getInput();
 	}
 
-	private int tick = 0;
-
 	public void tick() {
-		if(tick % 10 == 0) {
-		}
 		move();
+		checkArea();
 	}
 
-	private void checkArea(Graphics g) {
+	private void checkArea() {
 		int centerX = PokeLoop.WIDTH / 2 - 16;
 		int centerY = PokeLoop.HEIGHT / 2 - 20;
 		
@@ -51,9 +52,35 @@ public class Player extends Entity {
 	}
 
 	private void move() {
-		tick++;
 		movement();
-		tick %= 30;
+		checkMove();
+	}
+	
+	private Pokemon pokemon;
+
+	private void checkMove() {
+		PokeArea area = screen.currentArea;
+		if(area == null)
+			return;
+		
+		int x = -(screen.xOffset / 32 + area.getMapX() - 7);
+		int y = -(screen.yOffset / 32 + area.getMapY() - 6);
+		
+		Tile tile = screen.currentArea.getTilemap().get(new Point(x, y));
+		if(tile != null) {
+			if(tile.isGrass()) {
+				ArrayList<Integer> encounters = area.getEncounters();
+				encounters.add(6);
+				int i = rnd.nextInt(encounters.size());
+				int pokeID = encounters.get(i);
+				encounters.remove(i);
+				Pokemon pokemon = new Pokemon(pokeID);
+				this.pokemon = pokemon;
+			}
+		}
+		else {
+			System.out.println(x + " " + y);
+		}
 	}
 
 	private void movement() {
@@ -76,7 +103,9 @@ public class Player extends Entity {
 	}
 
 	public void render(Graphics g) {
-		checkArea(g);
+		if(pokemon != null) {
+			g.drawImage(pokemon.getFront(), 0, 0, null);
+		}
 		g.drawImage(animation[mode][direction], PokeLoop.WIDTH / 2 - 16, PokeLoop.HEIGHT / 2 - 20, 32, 40, null);
 	}
 

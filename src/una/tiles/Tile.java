@@ -32,5 +32,9 @@ public class Tile {
 	public BufferedImage getImage() {
 		return Tiles.getImage(tileID);
 	}
+	
+	public boolean isGrass() {
+		return tileID == 1947;
+	}
 
 }

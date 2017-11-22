@@ -7,8 +7,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 
@@ -17,6 +19,8 @@ import una.world.PokeArea;
 import una.world.PokeArea.AreaData;
 
 public class Tools {
+	
+	private static Random rnd = new Random();
 
 	public static String getAreaSrc(int areaID) {
 		FileReader fileReader;
@@ -209,6 +213,14 @@ public class Tools {
 		sprites[3] = images[3].getSubimage(x * 80, y * 80, 80, 80);
 
 		return sprites;
+	}
+
+	public static boolean isShiny() {
+		return rnd.nextInt(8192) == 0;
+	}
+
+	public static ArrayList<Integer> loadEncounters(int areaID) {
+		return null;
 	}
 
 }

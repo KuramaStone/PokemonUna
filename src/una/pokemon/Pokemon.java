@@ -17,12 +17,17 @@ public class Pokemon {
 	
 	//0:back,1:front,2:backShiny,3:frontShiny
 	private BufferedImage[] images;
+	
+	public Pokemon(int id) {
+		this(id, null, Tools.isShiny());
+	}
 
-	public Pokemon(int id, String nickname) {
+	public Pokemon(int id, String nickname, boolean shiny) {
 		this.id = id;
 		this.nickname = nickname;
-		this.trueName = Tools.loadTrueName(id);
+		this.shiny = shiny;
 
+		trueName = Tools.loadTrueName(id);
 		stats = Tools.loadStats(id);
 		images = Tools.loadSprites(id);
 	}

@@ -1,0 +1,4 @@
+##routeID,areaType,pokemonID,minLvl,maxLvl,amount
+0,1,15,2,4,50
+0,1,18,2,4,49
+0,1,6,5,7,1

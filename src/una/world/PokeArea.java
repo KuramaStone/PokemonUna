@@ -1,6 +1,7 @@
 package una.world;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,6 +9,8 @@ import una.tiles.Tile;
 import una.toolbox.Tools;
 
 public class PokeArea {
+	
+	private ArrayList<Integer> encounters = new ArrayList<>();
 	
 	private int areaID = -1;
 	
@@ -40,6 +43,10 @@ public class PokeArea {
 	
 	public int getMapY() {
 		return data.getMapOffsetY();
+	}
+	
+	public ArrayList<Integer> getEncounters() {
+		return encounters;
 	}
 	
 	public static class AreaData {
