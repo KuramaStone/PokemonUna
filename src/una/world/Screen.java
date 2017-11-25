@@ -2,9 +2,11 @@ package una.world;
 
 import java.awt.Graphics;
 
+import una.battle.Battle;
 import una.engine.PokeLoop;
 import una.engine.TileRenderer;
 import una.entity.Player;
+import una.font.TextRenderer;
 import una.toolbox.Tools;
 
 public class Screen {
@@ -13,6 +15,7 @@ public class Screen {
 
 	// Renderers
 	private TileRenderer tileR;
+	private TextRenderer textR;
 
 	// Current Area
 	public PokeArea currentArea;
@@ -21,10 +24,16 @@ public class Screen {
 
 	// Player
 	private Player player;
+	
+	//Current battle
+	private Battle battle;
 
 	public Screen(PokeLoop loop) {
 		player = new Player(loop, this);
 		tileR = new TileRenderer(this);
+		textR = new TextRenderer();
+		textR.addText(0, 10, 10, "Hello World");
+		
 		setArea(62);
 	}
 
@@ -36,31 +45,34 @@ public class Screen {
 	}
 
 	public void render(Graphics g) {
-		for(PokeArea spec : specAreas) {
-			if(spec != null) {
-				tileR.render(g, spec, spec.getMapX(), spec.getMapY());
+		if(battle == null) {
+			for(PokeArea spec : specAreas) {
+				if(spec != null) {
+					tileR.render(g, spec, spec.getMapX(), spec.getMapY());
+				}
 			}
-		}
-		tileR.render(g, currentArea, currentArea.getMapX(), currentArea.getMapY());
+			tileR.render(g, currentArea, currentArea.getMapX(), currentArea.getMapY());
 
-		player.render(g);
+			player.render(g);
+		}
+		else {
+			battle.render(g);
+		}
+		
+		textR.render(g);
 	}
 
 	public void tick() {
-		player.tick();
+		if(battle == null) {
+			player.tick();
+		}
 	}
 
 	public void addXOffset(int offset) {
-		// if((xOffset + offset <= 0) &&
-		// ((xOffset + offset - PokeLoop.WIDTH) >= (-currentArea.getWidth() * 32))) {
-		// }
 		xOffset += offset;
 	}
 
 	public void addYOffset(int offset) {
-		// if((yOffset + offset <= 0) &&
-		// ((yOffset + offset - PokeLoop.HEIGHT) >= (-currentArea.getHeight() * 32))) {
-		// }
 		yOffset += offset;
 	}
 

@@ -10,17 +10,21 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import javax.imageio.ImageIO;
 
+import una.pokemon.Encounter;
 import una.tiles.Tile;
 import una.world.PokeArea;
 import una.world.PokeArea.AreaData;
 
 public class Tools {
-	
-	private static Random rnd = new Random();
+
+	// private static Random rnd = new Random();
+
+	static {
+		loadCharacters();
+	}
 
 	public static String getAreaSrc(int areaID) {
 		FileReader fileReader;
@@ -31,17 +35,19 @@ public class Tools {
 
 			String line = "";
 
-			while ((line = bufferedReader.readLine()) != null) {
+			while((line = bufferedReader.readLine()) != null) {
 				int id = Integer.parseInt(line.split(":")[0]);
-				if (id == areaID) {
+				if(id == areaID) {
 					return line.split(":")[1];
 				}
 			}
 
 			bufferedReader.close();
-		} catch (FileNotFoundException e) {
+		}
+		catch(FileNotFoundException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
+		}
+		catch(IOException e) {
 			e.printStackTrace();
 		}
 
@@ -51,7 +57,8 @@ public class Tools {
 	public static BufferedImage getImage(String path) {
 		try {
 			return ImageIO.read(new File(path));
-		} catch (Exception e) {
+		}
+		catch(Exception e) {
 			e.printStackTrace();
 		}
 
@@ -72,15 +79,16 @@ public class Tools {
 
 			int lineX = 0;
 			int lineY = 0;
-			while ((line = bufferedReader.readLine()) != null) {
+			while((line = bufferedReader.readLine()) != null) {
 				lineX = 0;
 
-				if (lineY == 0) {
+				if(lineY == 0) {
 					String[] s = line.split("/");
 					mapX = Integer.valueOf(s[0]);
 					mapY = Integer.valueOf(s[1]);
-				} else {
-					for (String s : line.split("/")) {
+				}
+				else {
+					for(String s : line.split("/")) {
 						Integer i = Integer.valueOf(s);
 						tilemap.put(new Point(lineX, lineY), new Tile(new Position(lineX, lineY), i));
 						lineX++;
@@ -94,10 +102,12 @@ public class Tools {
 			height = lineY - 2;
 
 			bufferedReader.close();
-		} catch (FileNotFoundException e) {
+		}
+		catch(FileNotFoundException e) {
 			System.out.println("Unable to open file '" + fileName + "'");
 			e.printStackTrace();
-		} catch (IOException e) {
+		}
+		catch(IOException e) {
 			System.out.println("Unable to open file '" + fileName + "'");
 			e.printStackTrace();
 		}
@@ -113,13 +123,13 @@ public class Tools {
 			BufferedReader br = new BufferedReader(fr);
 
 			String line;
-			while ((line = br.readLine()) != null) {
-				if (!line.startsWith("##")) {
+			while((line = br.readLine()) != null) {
+				if(!line.startsWith("##")) {
 					Integer id = Integer.parseInt(line.split(",")[0]);
-					if (id == i) {
-						for (int j = 1; j < 5; j++) {
+					if(id == i) {
+						for(int j = 1; j < 5; j++) {
 							Integer k = Integer.parseInt(line.split(",")[j]);
-							if (k != -1) {
+							if(k != -1) {
 								conn[c] = new PokeArea(Integer.parseInt(line.split(",")[j]));
 								c++;
 							}
@@ -129,9 +139,11 @@ public class Tools {
 			}
 
 			br.close();
-		} catch (FileNotFoundException e1) {
+		}
+		catch(FileNotFoundException e1) {
 			e1.printStackTrace();
-		} catch (IOException e) {
+		}
+		catch(IOException e) {
 			e.printStackTrace();
 		}
 
@@ -146,18 +158,19 @@ public class Tools {
 			BufferedReader br = new BufferedReader(fr);
 
 			String line;
-			while ((line = br.readLine()) != null) {
-				if (line.startsWith("##"))
+			while((line = br.readLine()) != null) {
+				if(line.startsWith("##"))
 					continue;
 				String[] data = line.split(",");
 				int dataID = Integer.parseInt(data[0]);
 
-				if (id == dataID) {
+				if(id == dataID) {
 					stats[i++] = Integer.parseInt(data[2]);
 				}
 			}
 			br.close();
-		} catch (Exception e) {
+		}
+		catch(Exception e) {
 			e.printStackTrace();
 		}
 
@@ -171,34 +184,32 @@ public class Tools {
 			BufferedReader br = new BufferedReader(fr);
 
 			String line;
-			while ((line = br.readLine()) != null) {
-				if (line.startsWith("##"))
+			while((line = br.readLine()) != null) {
+				if(line.startsWith("##"))
 					continue;
 				String[] data = line.split(",");
 				int dataID = Integer.parseInt(data[0]);
 
-				if (id == dataID) {
+				if(id == dataID) {
 					int lang = Integer.parseInt(data[1]);
-					if (lang == 9) {
+					if(lang == 9) {
 						return data[2];
 					}
 				}
 			}
 
 			br.close();
-		} catch (Exception e) {
+		}
+		catch(Exception e) {
 			e.printStackTrace();
 		}
 
 		return null;
 	}
-	
-	private static BufferedImage[] images = {
-			getImage("res\\sprites\\pokemon_back_1.png"),
-			getImage("res\\sprites\\pokemon_front_1.png"),
-			getImage("res\\sprites\\shiny_pokemon_back_1.png"),
-			getImage("res\\sprites\\shiny_pokemon_front_1.png")
-	};
+
+	private static BufferedImage[] images = { getImage("res\\sprites\\pokemon_back_1.png"),
+			getImage("res\\sprites\\pokemon_front_1.png"), getImage("res\\sprites\\shiny_pokemon_back_1.png"),
+			getImage("res\\sprites\\shiny_pokemon_front_1.png") };
 
 	public static BufferedImage[] loadSprites(int id) {
 		id--;
@@ -215,12 +226,146 @@ public class Tools {
 		return sprites;
 	}
 
-	public static boolean isShiny() {
-		return rnd.nextInt(8192) == 0;
+	public static ArrayList<Encounter> loadEncounters(int areaID) {
+		ArrayList<Encounter> encounters = new ArrayList<>();
+		try {
+			FileReader fr = new FileReader("res\\data\\encounters.txt");
+			BufferedReader br = new BufferedReader(fr);
+
+			String line;
+			while((line = br.readLine()) != null) {
+				if(!line.startsWith("##")) {
+					String data[] = line.split(",");
+					int route = Integer.parseInt(data[0]);
+					if(route == areaID) {
+						int area = Integer.parseInt(data[1]);
+						int pokemon = Integer.parseInt(data[2]);
+						int minLvl = Integer.parseInt(data[3]);
+						int maxLvl = Integer.parseInt(data[4]);
+						int amount = Integer.parseInt(data[5]);
+
+						for(int i = 0; i < amount; i++) {
+							encounters.add(new Encounter(pokemon, minLvl, maxLvl, area));
+						}
+					}
+				}
+			}
+
+			br.close();
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+
+		return encounters;
 	}
 
-	public static ArrayList<Integer> loadEncounters(int areaID) {
-		return null;
+	private static BufferedImage battleBackgrounds = getImage("res\\sprites\\battle\\backgrounds.png");
+
+	public static BufferedImage loadBackground(int background) {
+		if(background > 9 || background < 0) {
+			background = 1;
+		}
+
+		int x = (background * 240) % 720;
+		int y = (background * 240) / 720;
+
+		return battleBackgrounds.getSubimage(x, y, 240, 112);
+	}
+
+	private static Map<Integer, BufferedImage> characters;
+
+	public static BufferedImage getCharacter(Integer i) {
+		return characters.get(i);
+	}
+
+	private static void loadCharacters() {
+		characters = new HashMap<>();
+		BufferedImage image = getImage("res\\sprites\\characters.png");
+
+		try {
+			FileReader fr = new FileReader("res\\data\\character_map.txt");
+			BufferedReader br = new BufferedReader(fr);
+
+			String line;
+			while((line = br.readLine()) != null) {
+				if(!line.startsWith("##")) {
+					String[] str = line.split(":");
+					String[] data = str[1].split(",");
+					int id = parse(str[0]);
+					int x = parse(data[0]);
+					int y = parse(data[1]);
+					int w = parse(data[2]);
+					int h = parse(data[3]);
+					
+					characters.put(id, image.getSubimage(x, y, w, h));
+				}
+			}
+			
+			br.close();
+
+		}
+		catch(FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public static int parse(String string) {
+		if(!isNumeric(string)) {
+			return -1;
+		}
+		return Integer.parseInt(string);
+	}
+
+	public static int getCharID(char c) {
+		String s = c + "";
+
+		int id = 0;
+		if(isNumeric(s)) {
+
+		}
+		else if(isLetter(s)) {
+			id = (int) s.toLowerCase().charAt(0) - 97;
+			if(s.equals(s.toUpperCase())) { // If 's' is uppercase
+				id += 26;
+			}
+		}
+		else {
+			switch(s) {
+				case "." :
+					id = 52;
+				case "," :
+					id = 53;
+				case "!" :
+					id = 54;
+				case "?" :
+					id = 55;
+				case "/" :
+					id = 56;
+				case "~" :
+					id = 57;
+				case "`" :
+					id = 58;
+				case "&" :
+					id = 59;
+				case "*" :
+					id = 60;
+			}
+		}
+
+		return id;
+	}
+
+	private static boolean isLetter(String s) {
+		return s != null && s.toLowerCase().matches("[a-z]");
+	}
+
+	private static boolean isNumeric(String s) {
+		return s != null && s.matches("[-+]?\\d*\\.?\\d+");
 	}
 
 }

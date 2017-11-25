@@ -106,6 +106,7 @@ public class PokeLoop {
 	public static void main(String[] args) {
 		PokeLoop loop = new PokeLoop();
 		loop.start();
+//		System.out.println("A".matches("[a-z]"));
 	}
 	
 	public InputHandler getInput() {

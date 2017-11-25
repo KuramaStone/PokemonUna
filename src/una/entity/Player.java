@@ -9,8 +9,10 @@ import java.util.ArrayList;
 
 import una.engine.PokeLoop;
 import una.input.InputHandler;
+import una.pokemon.Encounter;
 import una.pokemon.Pokemon;
 import una.tiles.Tile;
+import una.toolbox.PokeTools;
 import una.toolbox.Sprites;
 import una.world.PokeArea;
 import una.world.Screen;
@@ -21,6 +23,8 @@ public class Player extends Entity {
 	private int direction = 0, mode = 1;
 
 	private InputHandler input;
+	
+	private Pokemon pokemon;
 
 	public Player(PokeLoop loop, Screen screen) {
 		super(loop, screen);
@@ -31,6 +35,7 @@ public class Player extends Entity {
 	public void tick() {
 		move();
 		checkArea();
+		mode %= 3;
 	}
 
 	private void checkArea() {
@@ -50,13 +55,61 @@ public class Player extends Entity {
 		}
 
 	}
+	
+	private int ticks;
 
 	private void move() {
-		movement();
-		checkMove();
+		if(ticks % 3 == 0) {
+			movement();
+		}
+		ticks++;
+		ticks %= 30;
 	}
 	
-	private Pokemon pokemon;
+	private boolean[] ani = new boolean[4];
+	private boolean left, useKeys;
+
+	private void movement() {
+		useKeys =  !ani[direction];
+		
+		if((input.isKeyDown(KeyEvent.VK_W) && useKeys) || ani[1]) {
+			direction = 1;
+			screen.addYOffset(16);
+		}
+		else if((input.isKeyDown(KeyEvent.VK_S) && useKeys) || ani[0]) {
+			direction = 0;
+			screen.addYOffset(-16);
+		}
+		else if((input.isKeyDown(KeyEvent.VK_A) && useKeys) || ani[2]) {
+			direction = 2;
+			screen.addXOffset(16);
+		}
+		else if((input.isKeyDown(KeyEvent.VK_D) && useKeys) || ani[3]) {
+			direction = 3;
+			screen.addXOffset(-16);
+		}
+		else {
+			return;
+		}
+
+		if(ani[direction]) {
+			mode = 1;
+		}
+		else {
+			if(left) {
+				mode = 2;
+			}
+			else {
+				mode = 0;
+			}
+			left = !left;
+		}
+		
+		ani[direction] = !ani[direction];
+		System.out.println(mode);
+		
+		checkMove();
+	}
 
 	private void checkMove() {
 		PokeArea area = screen.currentArea;
@@ -68,37 +121,19 @@ public class Player extends Entity {
 		
 		Tile tile = screen.currentArea.getTilemap().get(new Point(x, y));
 		if(tile != null) {
-			if(tile.isGrass()) {
-				ArrayList<Integer> encounters = area.getEncounters();
-				encounters.add(6);
-				int i = rnd.nextInt(encounters.size());
-				int pokeID = encounters.get(i);
-				encounters.remove(i);
-				Pokemon pokemon = new Pokemon(pokeID);
-				this.pokemon = pokemon;
+			if(tile.isGrass() && (rnd.nextInt(100)+1 < area.getEncounterChance(1))) {
+				ArrayList<Encounter> encounters = area.getEncounters();
+				if(encounters.size() > 0) {
+					int i = rnd.nextInt(encounters.size());
+					Encounter encounter = encounters.get(i);
+					encounters.remove(i);
+					this.pokemon = PokeTools.createPokemon(encounter);
+					System.out.println(encounters.size());
+				}
+				else {
+					//No more pokemon on this route
+				}
 			}
-		}
-		else {
-			System.out.println(x + " " + y);
-		}
-	}
-
-	private void movement() {
-		if(input.isKeyDown(KeyEvent.VK_W)) {
-			direction = 1;
-			screen.addYOffset(32);
-		}
-		else if(input.isKeyDown(KeyEvent.VK_S)) {
-			direction = 0;
-			screen.addYOffset(-32);
-		}
-		else if(input.isKeyDown(KeyEvent.VK_A)) {
-			direction = 2;
-			screen.addXOffset(32);
-		}
-		else if(input.isKeyDown(KeyEvent.VK_D)) {
-			direction = 3;
-			screen.addXOffset(-32);
 		}
 	}
 

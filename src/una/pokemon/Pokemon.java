@@ -2,6 +2,7 @@ package una.pokemon;
 
 import java.awt.image.BufferedImage;
 
+import una.toolbox.PokeTools;
 import una.toolbox.Tools;
 
 public class Pokemon {
@@ -9,7 +10,7 @@ public class Pokemon {
 	private final int id;
 
 	// hp,atk,def,spa,spd,spe
-	private int[] stats;
+	private int[] baseStats;
 
 	private String trueName, nickname;
 	private int level;
@@ -18,17 +19,20 @@ public class Pokemon {
 	//0:back,1:front,2:backShiny,3:frontShiny
 	private BufferedImage[] images;
 	
-	public Pokemon(int id) {
-		this(id, null, Tools.isShiny());
+	private int currentHealth = 50, maxHealth = 100;
+	
+	public Pokemon(int id, int level) {
+		this(id, level, null, PokeTools.isShiny());
 	}
 
-	public Pokemon(int id, String nickname, boolean shiny) {
+	public Pokemon(int id, int level, String nickname, boolean shiny) {
 		this.id = id;
+		this.level = level;
 		this.nickname = nickname;
 		this.shiny = shiny;
 
 		trueName = Tools.loadTrueName(id);
-		stats = Tools.loadStats(id);
+		baseStats = Tools.loadStats(id);
 		images = Tools.loadSprites(id);
 	}
 	
@@ -53,7 +57,7 @@ public class Pokemon {
 	}
 
 	public int[] getStats() {
-		return stats;
+		return baseStats;
 	}
 
 	public void setNickname(String nick) {
@@ -66,6 +70,18 @@ public class Pokemon {
 
 	public String getTrueName() {
 		return trueName;
+	}
+
+	public boolean isShiny() {
+		return shiny;
+	}
+
+	public int getCurrentHealth() {
+		return currentHealth;
+	}
+
+	public int getMaxHealth() {
+		return maxHealth;
 	}
 
 }

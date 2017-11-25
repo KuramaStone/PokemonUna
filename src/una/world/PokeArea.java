@@ -5,20 +5,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import una.pokemon.Encounter;
 import una.tiles.Tile;
 import una.toolbox.Tools;
 
 public class PokeArea {
 	
-	private ArrayList<Integer> encounters = new ArrayList<>();
+	private ArrayList<Encounter> encounters = new ArrayList<>();
 	
 	private int areaID = -1;
 	
 	private AreaData data;
 	
 	public PokeArea(int areaID) {
-		data = Tools.loadArea(Tools.getAreaSrc(areaID));
 		this.areaID = areaID;
+		data = Tools.loadArea(Tools.getAreaSrc(areaID));
+		encounters = Tools.loadEncounters(areaID);
 	}
 
 	public Map<Point, Tile> getTilemap() {
@@ -45,7 +47,7 @@ public class PokeArea {
 		return data.getMapOffsetY();
 	}
 	
-	public ArrayList<Integer> getEncounters() {
+	public ArrayList<Encounter> getEncounters() {
 		return encounters;
 	}
 	
@@ -89,6 +91,10 @@ public class PokeArea {
 		public Map<Point, Tile> getTileMap() {
 			return tilemap;
 		}
+	}
+
+	public int getEncounterChance(int i) {
+		return 33;
 	}
 
 }
