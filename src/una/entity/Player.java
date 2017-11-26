@@ -23,8 +23,12 @@ public class Player extends Entity {
 	private int direction = 0, mode = 1;
 
 	private InputHandler input;
-	
+
 	private Pokemon pokemon;
+
+	// Animation movement
+	private int ticks;
+	private boolean running;
 
 	public Player(PokeLoop loop, Screen screen) {
 		super(loop, screen);
@@ -41,13 +45,13 @@ public class Player extends Entity {
 	private void checkArea() {
 		int centerX = PokeLoop.WIDTH / 2 - 16;
 		int centerY = PokeLoop.HEIGHT / 2 - 20;
-		
+
 		for(PokeArea spec : screen.specAreas) {
 			if(spec != null) {
 				int px = screen.xOffset + spec.getMapX() * 32;
 				int py = screen.yOffset + spec.getMapY() * 32;
-				
-				if(new Rectangle(px, py, spec.getWidth()*32, spec.getHeight()*32)
+
+				if(new Rectangle(px, py, spec.getWidth() * 32, spec.getHeight() * 32)
 						.intersects(centerX, centerY, 1, 1)) {
 					screen.setArea(spec.getAreaID());
 				}
@@ -55,83 +59,117 @@ public class Player extends Entity {
 		}
 
 	}
-	
-	private int ticks;
 
 	private void move() {
-		if(ticks % 3 == 0) {
+		if(movement > 0) {
+			moveScreen(running ? 8 : 4);
+			movement--;
+		}
+		else {
+			checkRunning();
+			mode = 1;
 			movement();
 		}
+
 		ticks++;
 		ticks %= 30;
 	}
+
+	public void moveScreen(int i) {
+		if(direction == 0) {
+			screen.addYOffset(-i);
+		}
+		else if(direction == 1) {
+			screen.addYOffset(i);
+		}
+		else if(direction == 2) {
+			screen.addXOffset(i);
+		}
+		else if(direction == 3) {
+			screen.addXOffset(-i);
+		}
+		
+		if(movement == (running ? 2 : 5)) {
+			if(left) {
+				mode = 0;
+			}
+			else {
+				mode = 2;
+			}
+			left = !left;
+		}
+	}
 	
-	private boolean[] ani = new boolean[4];
-	private boolean left, useKeys;
+	private boolean left;
+	private int movement;
 
 	private void movement() {
-		useKeys =  !ani[direction];
-		
-		if((input.isKeyDown(KeyEvent.VK_W) && useKeys) || ani[1]) {
-			direction = 1;
-			screen.addYOffset(16);
-		}
-		else if((input.isKeyDown(KeyEvent.VK_S) && useKeys) || ani[0]) {
+
+		// down
+		int i = running ? 8 : 4;
+		if(input.isKeyDown(KeyEvent.VK_S)) {
 			direction = 0;
-			screen.addYOffset(-16);
+			moveScreen(i);
 		}
-		else if((input.isKeyDown(KeyEvent.VK_A) && useKeys) || ani[2]) {
+		// up
+		else if(input.isKeyDown(KeyEvent.VK_W)) {
+			direction = 1;
+			moveScreen(i);
+		}
+		// left
+		else if(input.isKeyDown(KeyEvent.VK_A)) {
 			direction = 2;
-			screen.addXOffset(16);
+			moveScreen(i);
 		}
-		else if((input.isKeyDown(KeyEvent.VK_D) && useKeys) || ani[3]) {
+		// right
+		else if(input.isKeyDown(KeyEvent.VK_D)) {
 			direction = 3;
-			screen.addXOffset(-16);
+			moveScreen(i);
 		}
 		else {
 			return;
 		}
 
-		if(ani[direction]) {
-			mode = 1;
-		}
-		else {
-			if(left) {
-				mode = 2;
-			}
-			else {
-				mode = 0;
-			}
-			left = !left;
-		}
-		
-		ani[direction] = !ani[direction];
-		System.out.println(mode);
+		movement = running ? 3 : 7;
 		
 		checkMove();
+	}
+
+	private void checkRunning() {
+		if(input.isKeyDown(KeyEvent.VK_SPACE)) {
+			running = true;
+			if(animation != Sprites.playerRun) {
+				animation = Sprites.playerRun;
+			}
+		}
+		else {
+			running = false;
+			if(animation != Sprites.playerWalk) {
+				animation = Sprites.playerWalk;
+			}
+		}
 	}
 
 	private void checkMove() {
 		PokeArea area = screen.currentArea;
 		if(area == null)
 			return;
-		
+
 		int x = -(screen.xOffset / 32 + area.getMapX() - 7);
 		int y = -(screen.yOffset / 32 + area.getMapY() - 6);
-		
+
 		Tile tile = screen.currentArea.getTilemap().get(new Point(x, y));
 		if(tile != null) {
-			if(tile.isGrass() && (rnd.nextInt(100)+1 < area.getEncounterChance(1))) {
+			if(tile.isGrass() && (rnd.nextInt(100) + 1 < area.getEncounterChance(1))) {
 				ArrayList<Encounter> encounters = area.getEncounters();
 				if(encounters.size() > 0) {
 					int i = rnd.nextInt(encounters.size());
 					Encounter encounter = encounters.get(i);
 					encounters.remove(i);
 					this.pokemon = PokeTools.createPokemon(encounter);
-					System.out.println(encounters.size());
 				}
 				else {
-					//No more pokemon on this route
+					// No more pokemon on this route
 				}
 			}
 		}
@@ -141,7 +179,7 @@ public class Player extends Entity {
 		if(pokemon != null) {
 			g.drawImage(pokemon.getFront(), 0, 0, null);
 		}
-		g.drawImage(animation[mode][direction], PokeLoop.WIDTH / 2 - 16, PokeLoop.HEIGHT / 2 - 20, 32, 40, null);
+		g.drawImage(animation[mode][direction], PokeLoop.WIDTH / 2 - 16, PokeLoop.HEIGHT / 2 - 25, 32, 40, null);
 	}
 
 }
