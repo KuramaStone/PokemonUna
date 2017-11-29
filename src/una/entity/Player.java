@@ -1,7 +1,8 @@
 package una.entity;
 
+import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Point;
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
@@ -27,8 +28,12 @@ public class Player extends Entity {
 	private Pokemon pokemon;
 
 	// Animation movement
+	@SuppressWarnings("unused")
 	private int ticks;
 	private boolean running;
+
+	private boolean left;
+	private int movement;
 
 	public Player(PokeLoop loop, Screen screen) {
 		super(loop, screen);
@@ -43,16 +48,23 @@ public class Player extends Entity {
 	}
 
 	private void checkArea() {
-		int centerX = PokeLoop.WIDTH / 2 - 16;
-		int centerY = PokeLoop.HEIGHT / 2 - 20;
+		int centerX = PokeLoop.WIDTH / 2;
+		int centerY = PokeLoop.HEIGHT / 2;
 
 		for(PokeArea spec : screen.specAreas) {
 			if(spec != null) {
 				int px = screen.xOffset + spec.getMapX() * 32;
-				int py = screen.yOffset + spec.getMapY() * 32;
+				int py = screen.yOffset + (spec.getMapY() + 1) * 32;
 
-				if(new Rectangle(px, py, spec.getWidth() * 32, spec.getHeight() * 32)
-						.intersects(centerX, centerY, 1, 1)) {
+				// For showing the borders
+				//
+				// g.setColor(Color.PINK);
+				// g.fillRect(px, py, spec.getWidth() * 32, (spec.getHeight()-1) * 32);
+				// g.setColor(Color.BLUE);
+				// g.fillRect(centerX - 1, centerY - 1, 1, 1);
+
+				if(new Rectangle(px, py, spec.getWidth() * 32, (spec.getHeight() - 1) * 32)
+						.intersects(centerX - 1, centerY - 1, 1, 1)) {
 					screen.setArea(spec.getAreaID());
 				}
 			}
@@ -88,7 +100,7 @@ public class Player extends Entity {
 		else if(direction == 3) {
 			screen.addXOffset(-i);
 		}
-		
+
 		if(movement == (running ? 2 : 5)) {
 			if(left) {
 				mode = 0;
@@ -99,40 +111,59 @@ public class Player extends Entity {
 			left = !left;
 		}
 	}
-	
-	private boolean left;
-	private int movement;
+
+	private boolean canPlayerMove() {
+		PokeArea area = screen.currentArea;
+		int x = getMapX();
+		int y = getMapY();
+
+		if(direction == 0)
+			y++;
+		else if(direction == 1)
+			y--;
+		else if(direction == 2)
+			x--;
+		else if(direction == 3)
+			x++;
+
+		return area.canMove(x, y);
+	}
 
 	private void movement() {
 
+		int d;
 		// down
-		int i = running ? 8 : 4;
 		if(input.isKeyDown(KeyEvent.VK_S)) {
-			direction = 0;
-			moveScreen(i);
+			d = 0;
 		}
 		// up
 		else if(input.isKeyDown(KeyEvent.VK_W)) {
-			direction = 1;
-			moveScreen(i);
+			d = 1;
 		}
 		// left
 		else if(input.isKeyDown(KeyEvent.VK_A)) {
-			direction = 2;
-			moveScreen(i);
+			d = 2;
 		}
 		// right
 		else if(input.isKeyDown(KeyEvent.VK_D)) {
-			direction = 3;
-			moveScreen(i);
+			d = 3;
 		}
 		else {
 			return;
 		}
 
-		movement = running ? 3 : 7;
-		
-		checkMove();
+		if(d != direction) {
+			direction = d;
+			return;
+		}
+		direction = d;
+
+		if(!canPlayerMove()) {
+			return;
+		}
+		movement = running ? 4 : 8;
+
+		checkTile();
 	}
 
 	private void checkRunning() {
@@ -150,36 +181,46 @@ public class Player extends Entity {
 		}
 	}
 
-	private void checkMove() {
+	private void checkTile() {
 		PokeArea area = screen.currentArea;
 		if(area == null)
 			return;
 
-		int x = -(screen.xOffset / 32 + area.getMapX() - 7);
-		int y = -(screen.yOffset / 32 + area.getMapY() - 6);
-
-		Tile tile = screen.currentArea.getTilemap().get(new Point(x, y));
-		if(tile != null) {
-			if(tile.isGrass() && (rnd.nextInt(100) + 1 < area.getEncounterChance(1))) {
-				ArrayList<Encounter> encounters = area.getEncounters();
-				if(encounters.size() > 0) {
-					int i = rnd.nextInt(encounters.size());
-					Encounter encounter = encounters.get(i);
-					encounters.remove(i);
-					this.pokemon = PokeTools.createPokemon(encounter);
-				}
-				else {
-					// No more pokemon on this route
-				}
+		Tile tile = screen.currentArea.getTile(getMapX(), getMapY() + 1);
+		if((tile != null) && (tile.isGrass()) &&
+				(rnd.nextInt(101) < area.getEncounterChance(1))) {
+			ArrayList<Encounter> encounters = area.getEncounters();
+			if(encounters.size() > 0) {
+				int i = rnd.nextInt(encounters.size());
+				Encounter encounter = encounters.get(i);
+				encounters.remove(i);
+				this.pokemon = PokeTools.createPokemon(encounter);
+			}
+			else {
+				// No more pokemon on this route
 			}
 		}
+	}
+
+	public int getMapX() {
+		return -(((int) screen.xOffset / 32) + screen.currentArea.getMapX() - 7);
+	}
+
+	public int getMapY() {
+		return -(((int) screen.yOffset / 32) + screen.currentArea.getMapY() - 6);
 	}
 
 	public void render(Graphics g) {
 		if(pokemon != null) {
 			g.drawImage(pokemon.getFront(), 0, 0, null);
 		}
-		g.drawImage(animation[mode][direction], PokeLoop.WIDTH / 2 - 16, PokeLoop.HEIGHT / 2 - 25, 32, 40, null);
+		g.drawImage(getSprite(), PokeLoop.WIDTH / 2 - 16, PokeLoop.HEIGHT / 2 - 25, 32, 40, null);
+	}
+
+	private Image getSprite() {
+		BufferedImage sprite = animation[mode][direction];
+
+		return sprite;
 	}
 
 }

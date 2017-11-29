@@ -1,5 +1,6 @@
 package una.toolbox;
 
+import java.awt.Color;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
@@ -98,8 +99,8 @@ public class Tools {
 				lineY++;
 			}
 
-			width = lineX - 1;
-			height = lineY - 2;
+			width = lineX;
+			height = lineY;
 
 			bufferedReader.close();
 		}
@@ -297,11 +298,11 @@ public class Tools {
 					int y = parse(data[1]);
 					int w = parse(data[2]);
 					int h = parse(data[3]);
-					
+
 					characters.put(id, image.getSubimage(x, y, w, h));
 				}
 			}
-			
+
 			br.close();
 
 		}
@@ -358,6 +359,65 @@ public class Tools {
 		}
 
 		return id;
+	}
+
+	public static Map<Integer, Integer> loadOverlay(int i) {
+		Map<Integer, Integer> overlay = new HashMap<>();
+
+		String loadfile = "res\\data\\mapdata\\" + i + ".txt";
+		File file = new File(loadfile);
+		if(!file.exists())
+			return overlay;
+
+		try {
+			FileReader fr = new FileReader(loadfile);
+			BufferedReader br = new BufferedReader(fr);
+
+			String line;
+			int count = 0;
+			while((line = br.readLine()) != null) {
+				for(String str : line.split("/")) {
+					int id = Integer.parseInt(str);
+					if(id != -1) {
+						overlay.put(count, id);
+					}
+					count++;
+				}
+			}
+
+			br.close();
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+
+		return overlay;
+	}
+
+	public static Color getColor(Integer value) {
+		switch(value) {
+			case 0 :
+				return new Color(255, 255, 255, 128);
+			case 1 :
+				return new Color(255, 0, 0, 128);
+			case 2 :
+				return new Color(255, 255, 0, 128);
+			case 3 :
+				return new Color(255, 100, 100, 128);
+			case 4 :
+				return new Color(255, 79, 175, 128);
+			case 5 :
+				return new Color(130, 45, 24, 128);
+			case 6 :
+				return new Color(98, 112, 130, 128);
+			case 7 :
+				return new Color(8, 130, 41, 128);
+			case 8 :
+				return new Color(0, 0, 0, 128);
+			case 9 :
+				return new Color(0, 255, 0, 128);
+		}
+		return null;
 	}
 
 	private static boolean isLetter(String s) {

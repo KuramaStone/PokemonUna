@@ -1,6 +1,7 @@
 package una.world;
 
 import java.awt.Graphics;
+import java.util.Map.Entry;
 
 import una.battle.Battle;
 import una.engine.PokeLoop;
@@ -24,8 +25,8 @@ public class Screen {
 
 	// Player
 	private Player player;
-	
-	//Current battle
+
+	// Current battle
 	private Battle battle;
 
 	public Screen(PokeLoop loop) {
@@ -33,7 +34,7 @@ public class Screen {
 		tileR = new TileRenderer(this);
 		textR = new TextRenderer();
 		textR.addText(0, 10, 10, "Hello World");
-		
+
 		setArea(62);
 	}
 
@@ -53,13 +54,30 @@ public class Screen {
 			}
 			tileR.render(g, currentArea, currentArea.getMapX(), currentArea.getMapY());
 
+//			drawOverlay(g);
+
 			player.render(g);
 		}
 		else {
 			battle.render(g);
 		}
-		
+
 		textR.render(g);
+	}
+
+	public void drawOverlay(Graphics g) {
+		for(Entry<Integer, Integer> set : currentArea.getOverlay().entrySet()) {
+			if(set.getKey() != null && set.getKey() != -1) {
+				Integer i = set.getKey();
+				int x = i % (currentArea.getWidth());
+				int y = i / (currentArea.getWidth());
+				int px = x * 32 + xOffset + (currentArea.getMapX()) * 32;
+				int py = y * 32 + yOffset + (currentArea.getMapY()+1) * 32;
+
+				g.setColor(Tools.getColor(set.getValue()));
+				g.fillRect(px, py, 32, 32);
+			}
+		}
 	}
 
 	public void tick() {
