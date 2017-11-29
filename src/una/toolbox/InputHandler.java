@@ -1,4 +1,4 @@
-package una.input;
+package una.toolbox;
 
 import java.awt.Component;
 import java.awt.event.KeyEvent;

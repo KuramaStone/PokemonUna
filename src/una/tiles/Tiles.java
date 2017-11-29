@@ -1,4 +1,4 @@
-package una.toolbox;
+package una.tiles;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

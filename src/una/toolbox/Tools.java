@@ -338,23 +338,23 @@ public class Tools {
 		else {
 			switch(s) {
 				case "." :
-					id = 52;
+					id = 52; break;
 				case "," :
-					id = 53;
+					id = 53; break;
 				case "!" :
-					id = 54;
+					id = 54; break;
 				case "?" :
-					id = 55;
+					id = 55; break;
 				case "/" :
-					id = 56;
+					id = 56; break;
 				case "~" :
-					id = 57;
+					id = 57; break;
 				case "`" :
-					id = 58;
+					id = 58; break;
 				case "&" :
-					id = 59;
+					id = 59; break;
 				case "*" :
-					id = 60;
+					id = 60; break;
 			}
 		}
 

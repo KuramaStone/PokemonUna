@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
 
-import una.input.InputHandler;
+import una.toolbox.InputHandler;
 import una.world.Screen;
 
 public class PokeLoop {

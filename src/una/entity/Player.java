@@ -1,6 +1,5 @@
 package una.entity;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Rectangle;
@@ -9,10 +8,10 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import una.engine.PokeLoop;
-import una.input.InputHandler;
 import una.pokemon.Encounter;
 import una.pokemon.Pokemon;
 import una.tiles.Tile;
+import una.toolbox.InputHandler;
 import una.toolbox.PokeTools;
 import una.toolbox.Sprites;
 import una.world.PokeArea;

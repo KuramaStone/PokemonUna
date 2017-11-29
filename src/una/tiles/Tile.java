@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 
 import una.toolbox.Position;
 import una.toolbox.Sprites;
-import una.toolbox.Tiles;
 
 public class Tile {
 	

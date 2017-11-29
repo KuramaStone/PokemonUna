@@ -33,7 +33,7 @@ public class Screen {
 		player = new Player(loop, this);
 		tileR = new TileRenderer(this);
 		textR = new TextRenderer();
-		textR.addText(0, 10, 10, "Hello World");
+		textR.addText(0, 10, 10, "Hello World!?/.,&*");
 
 		setArea(62);
 	}

@@ -28,14 +28,12 @@ public class PokeArea {
 	}
 
 	public boolean canMove(int x, int y) {
-		return true;
+		int i = x + y * data.getWidth();
+		if(!overlay.containsKey(i)) {
+			return true;
+		}
 
-//		int i = x + y * data.getWidth();
-//		if(!overlay.containsKey(i)) {
-//			return true;
-//		}
-//
-//		return overlay.get(i) == (-1 & 9);
+		return overlay.get(i) == (-1 & 9);
 	}
 
 	public Map<Point, Tile> getTilemap() {
