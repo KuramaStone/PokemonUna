@@ -1,18 +1,22 @@
 package una.world;
 
+import java.awt.Color;
 import java.awt.Graphics;
-import java.util.Map.Entry;
+import java.awt.event.KeyEvent;
 
 import una.battle.Battle;
 import una.engine.PokeLoop;
 import una.engine.TileRenderer;
 import una.entity.Player;
 import una.font.TextRenderer;
+import una.toolbox.InputHandler;
 import una.toolbox.Tools;
 
 public class Screen {
 
 	public int xOffset = 0, yOffset = 0;
+	
+	private PokeLoop loop;
 
 	// Renderers
 	private TileRenderer tileR;
@@ -28,8 +32,12 @@ public class Screen {
 
 	// Current battle
 	private Battle battle;
+	
+	private InputHandler input;
 
 	public Screen(PokeLoop loop) {
+		this.loop = loop;
+		this.input = loop.getInput();
 		player = new Player(loop, this);
 		tileR = new TileRenderer(this);
 		textR = new TextRenderer();
@@ -54,8 +62,6 @@ public class Screen {
 			}
 			tileR.render(g, currentArea, currentArea.getMapX(), currentArea.getMapY());
 
-//			drawOverlay(g);
-
 			player.render(g);
 		}
 		else {
@@ -63,26 +69,36 @@ public class Screen {
 		}
 
 		textR.render(g);
-	}
-
-	public void drawOverlay(Graphics g) {
-		for(Entry<Integer, Integer> set : currentArea.getOverlay().entrySet()) {
-			if(set.getKey() != null && set.getKey() != -1) {
-				Integer i = set.getKey();
-				int x = i % (currentArea.getWidth());
-				int y = i / (currentArea.getWidth());
-				int px = x * 32 + xOffset + (currentArea.getMapX()) * 32;
-				int py = y * 32 + yOffset + (currentArea.getMapY()+1) * 32;
-
-				g.setColor(Tools.getColor(set.getValue()));
-				g.fillRect(px, py, 32, 32);
-			}
+		
+		if(ssDelay > 0) {
+			g.setColor(new Color(0, 0, 0, (int) (128 * (ssDelay / 10d))));
+			g.fillRect(0, 0, PokeLoop.WIDTH, PokeLoop.HEIGHT);
 		}
 	}
+	
+	private int ssDelay;
 
 	public void tick() {
 		if(battle == null) {
 			player.tick();
+		}
+		
+		if(input.isKeyDown(KeyEvent.VK_SPACE)) {
+			loop.setSpeed(0.25D);
+		}
+		else {
+			loop.setSpeed(1.0D);
+		}
+		
+		if(ssDelay == 0 && input.isKeyDown(KeyEvent.VK_P)) {
+			loop.screenshot();
+			input.setKey(KeyEvent.VK_P, false);
+			
+			ssDelay = 10;
+		}
+		
+		if(ssDelay > 0) {
+			ssDelay--;
 		}
 	}
 

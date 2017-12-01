@@ -12,11 +12,14 @@ import una.pokemon.Pokemon;
 import una.tiles.Tile;
 import una.toolbox.InputHandler;
 import una.toolbox.PokeTools;
+import una.toolbox.Position;
 import una.toolbox.Sprites;
 import una.world.PokeArea;
 import una.world.Screen;
 
 public class Player extends Entity {
+
+	private PokeArea area;
 
 	private BufferedImage[][] animation;
 	private int direction = 0, mode = 1;
@@ -26,11 +29,13 @@ public class Player extends Entity {
 	private Pokemon pokemon;
 
 	// Animation movement
-	private int ticks;
+	private static int ticks;
 	private boolean isRunning;
 
 	private boolean left;
 	private int movement, moveDelay;
+
+	private GrassAnimation[] grass = new GrassAnimation[6];
 
 	public Player(PokeLoop loop, Screen screen) {
 		super(loop, screen);
@@ -39,6 +44,7 @@ public class Player extends Entity {
 	}
 
 	public void tick() {
+		area = screen.currentArea;
 		move();
 		checkArea();
 		mode %= 3;
@@ -68,7 +74,7 @@ public class Player extends Entity {
 		}
 
 	}
-	
+
 	private boolean doneMoving;
 
 	private void move() {
@@ -76,21 +82,21 @@ public class Player extends Entity {
 			moveDelay--;
 			return;
 		}
-		
+
 		if(movement > 0) {
 			moveScreen(isRunning ? 8 : 4);
 			movement--;
-			
+
 			if(movement == 0) {
 				doneMoving = true;
 			}
 		}
 		else {
 			if(doneMoving) {
+
 				doneMoving = false;
-				if(checkPokemon())  {
-					return;
-				}
+				checkPokemon();
+
 			}
 			checkRunning();
 			mode = 1;
@@ -127,20 +133,25 @@ public class Player extends Entity {
 	}
 
 	private boolean canPlayerMove() {
-		PokeArea area = screen.currentArea;
+		Position pos = adjacentTile(direction);
+
+		return area.canMove(pos.getX(), pos.getY());
+	}
+
+	private Position adjacentTile(int i) {
 		int x = getMapX();
 		int y = getMapY() - 1;
 
-		if(direction == 0)
+		if(i == 0)
 			y++;
-		else if(direction == 1)
+		else if(i == 1)
 			y--;
-		else if(direction == 2)
+		else if(i == 2)
 			x--;
-		else if(direction == 3)
+		else if(i == 3)
 			x++;
 
-		return area.canMove(x, y);
+		return new Position(x, y);
 	}
 
 	private void movement() {
@@ -177,12 +188,10 @@ public class Player extends Entity {
 			return;
 		}
 		movement = isRunning ? 4 : 8;
-		if(grassTick == 3)
-			grassTick = 0;
 	}
 
 	private void checkRunning() {
-		if(input.isKeyDown(KeyEvent.VK_SPACE)) {
+		if(input.isKeyDown(KeyEvent.VK_DOWN)) {
 			isRunning = true;
 			if(animation != Sprites.playerRun) {
 				animation = Sprites.playerRun;
@@ -197,11 +206,10 @@ public class Player extends Entity {
 	}
 
 	private boolean checkPokemon() {
-		PokeArea area = screen.currentArea;
 		if(area == null)
 			return false;
 
-		Tile tile = screen.currentArea.getTile(getMapX(), getMapY());
+		Tile tile = area.getTile(getMapX(), getMapY());
 		if((tile != null) && (tile.isGrass()) &&
 				(rnd.nextInt(101) < area.getEncounterChance(1))) {
 			ArrayList<Encounter> encounters = area.getEncounters();
@@ -216,37 +224,93 @@ public class Player extends Entity {
 				// No more pokemon on this route
 			}
 		}
-		
+
 		return false;
 	}
 
 	public int getMapX() {
-		return -(((int) screen.xOffset / 32) + screen.currentArea.getMapX() - 7);
+		return -(((int) screen.xOffset / 32) + area.getMapX() - 7);
 	}
 
 	public int getMapY() {
-		return -(((int) screen.yOffset / 32) + screen.currentArea.getMapY() - 6) + 1;
+		return -(((int) screen.yOffset / 32) + area.getMapY() - 6) + 1;
 	}
 
 	public void render(Graphics g) {
 		if(pokemon != null) {
 			g.drawImage(pokemon.getFront(), 0, 0, null);
 		}
-		g.drawImage(animation[mode][direction], PokeLoop.WIDTH / 2 - 16, PokeLoop.HEIGHT / 2 - 25, 32, 40, null);
-		
-		Tile tile = screen.currentArea.getTile(getMapX(), getMapY());
-		if(tile != null && tile.isGrass() && movement == 0) {
-			playGrassAnimation(g);
+		Tile tile = area.getTile(getMapX(), getMapY());
+		renderPlayer(g);
+
+		if(tile != null) {
+			renderGrass(tile, g);
+			renderPlayerHead(g);
+
+			if(tile.isGrass() && movement == 0) {
+				int x = tile.getPos().getX() * 32 + area.getMapX() * 32;
+				int y = tile.getPos().getY() * 32 + area.getMapY() * 32;
+				addGrassAni(x, y);
+			}
+		}
+	}
+
+	private void renderGrass(Tile tile, Graphics g) {
+		for(int i = 0; i < grass.length; i++) {
+			GrassAnimation ga = grass[i];
+			if(ga != null) {
+				int x = tile.getPos().getX() * 32 + area.getMapX() * 32;
+				int y = tile.getPos().getY() * 32 + area.getMapY() * 32;
+
+				if(ga.grassTick == 3 && !ga.compare(x, y)) {
+					grass[i] = null;
+				}
+				else {
+					ga.playGrassAnimation(g, screen);
+				}
+			}
+		}
+	}
+
+	private void addGrassAni(int x, int y) {
+		for(int i = 0; i < grass.length; i++) {
+			if(grass[i] == null) {
+				grass[i] = new GrassAnimation(x, y);
+				break;
+			}
 		}
 	}
 	
-	private int grassTick = 0;
+	private void renderPlayerHead(Graphics g) {
+		BufferedImage image = animation[mode][direction];
+		g.drawImage(image.getSubimage(0, 0, image.getWidth(), 15), PokeLoop.WIDTH / 2 - 16, PokeLoop.HEIGHT / 2 - 25, 32, 30, null);
+	}
 
-	private void playGrassAnimation(Graphics g) {
-		if(ticks % 3 == 0 && grassTick < 3) {
-			grassTick++;
+	private void renderPlayer(Graphics g) {
+		g.drawImage(animation[mode][direction], PokeLoop.WIDTH / 2 - 16, PokeLoop.HEIGHT / 2 - 25, 32, 40, null);
+	}
+
+	private static class GrassAnimation {
+
+		private int grassTick = 0;
+		private int x, y;
+
+		public GrassAnimation(int x, int y) {
+			this.x = x;
+			this.y = y;
 		}
-		g.drawImage(Sprites.tiles[4][grassTick], PokeLoop.WIDTH / 2 - 16, PokeLoop.HEIGHT / 2 - 25, 32, 40, null);
+
+		public boolean compare(int x, int y) {
+			return this.x == x && this.y == y;
+		}
+
+		public void playGrassAnimation(Graphics g, Screen screen) {
+			if(ticks % 5 == 0 && grassTick < 3) {
+				grassTick++;
+			}
+
+			g.drawImage(Sprites.tiles[4][grassTick], x + screen.xOffset, y + screen.yOffset, 32, 32, null);
+		}
 	}
 
 }

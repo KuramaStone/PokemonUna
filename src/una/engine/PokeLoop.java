@@ -4,21 +4,26 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Insets;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.text.DecimalFormat;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
+import una.toolbox.ClipboardImage;
 import una.toolbox.InputHandler;
 import una.world.Screen;
 
 public class PokeLoop {
-	
+
 	public static final int WIDTH = 480, HEIGHT = 480;
-	
+
 	private final JFrame frame;
 
 	public static double interpolation;
 
-	private static final int FPS = 30;
+	private static final int LIMITER = 33;
 
 	private BufferedImage backBuffer;
 	private Insets insets;
@@ -26,8 +31,10 @@ public class PokeLoop {
 	private boolean running = false;
 
 	private Screen screen;
-	
+
 	private InputHandler inputHandler;
+	private ClipboardImage clipboard;
+	private DecimalFormat df = new DecimalFormat("#00.00");
 
 	public PokeLoop() {
 		frame = new JFrame();
@@ -46,34 +53,50 @@ public class PokeLoop {
 		inputHandler = new InputHandler(frame);
 
 		screen = new Screen(this);
+		clipboard = new ClipboardImage();
 	}
+	
+	public int framesPerSecond;
+	
+	private double speed = 1.0D;
 
 	private void run() {
 		frame.setVisible(true);
-		int SKIP_TICKS = 1000 / FPS;
-		
+
+
+		int ticks = 0;
+		long last = 0, lastFPS = 0;
 		while(running) {
-			long time = System.currentTimeMillis();
+			int delay = (int) (1000 / LIMITER * speed);
+			long now = System.currentTimeMillis();
 
-			update();
-			render();
-
-			time = SKIP_TICKS - (System.currentTimeMillis() - time);
-
-			if(time > 0) {
-				try {
-					Thread.sleep(time);
+			if(last + delay <= now) {
+				update();
+				render();
+				
+				if(lastFPS + 1000 <= now) {
+					System.out.println(ticks);
+					framesPerSecond = ticks;
+					lastFPS = now;
+					ticks = 0;
 				}
-				catch(Exception e) {
-					e.printStackTrace();
-				}
+				ticks++;
+				
+				last = now;
 			}
-
-			interpolation = (time + SKIP_TICKS - (time += SKIP_TICKS) / SKIP_TICKS) / 100d;
+			
 		}
 
 		frame.setVisible(false);
 		System.exit(0);
+	}
+	
+	public double getSpeed() {
+		return speed;
+	}
+	
+	public void setSpeed(double d) {
+		this.speed = d;
 	}
 
 	private void render() {
@@ -82,15 +105,15 @@ public class PokeLoop {
 		Graphics bbg = backBuffer.getGraphics();
 
 		bbg.setColor(Color.WHITE);
-		bbg.setColor(Color.BLACK);
-		bbg.fillRect(0, 0, PokeLoop.WIDTH, PokeLoop.HEIGHT);
+		bbg.clearRect(0, 0, PokeLoop.WIDTH, PokeLoop.HEIGHT);
 
 		screen.render(bbg);
 
 		g.drawImage(backBuffer, insets.left, insets.top, frame);
 	}
-
+	
 	private void update() {
+		frame.setTitle("Pokemon Una | " + df.format((double) framesPerSecond / LIMITER * 100) + "%");
 		screen.tick();
 	}
 
@@ -106,11 +129,34 @@ public class PokeLoop {
 	public static void main(String[] args) {
 		PokeLoop loop = new PokeLoop();
 		loop.start();
-//		System.out.println("A".matches("[a-z]"));
 	}
-	
+
 	public InputHandler getInput() {
 		return inputHandler;
+	}
+	
+	public int getFPS() {
+		return framesPerSecond;
+	}
+
+	public void screenshot() {
+		int i = 0;
+		File file;
+		while((file = new File("res\\screenshots\\" + i + ".png")).exists()) {
+			i++;
+		}
+
+		try {
+			file.mkdirs();
+			ImageIO.write(backBuffer, "png", file);
+			clipboard.copyToClipboard(backBuffer);
+			System.out.println("Saved screenshot '" + file.getName() + "'");
+		}
+		catch(IOException e) {
+			System.out.println("Could not save screenshot '" + file.getName() + "'");
+			e.printStackTrace();
+		}
+
 	}
 
 }

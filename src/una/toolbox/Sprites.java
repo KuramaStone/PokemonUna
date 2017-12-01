@@ -12,7 +12,7 @@ public class Sprites {
 	public static BufferedImage[][] playerRun = new BufferedImage[3][4];
 
 	// [tile][tiles]
-	public static BufferedImage[][] tiles = new BufferedImage[12][8];
+	public static BufferedImage[][] tiles = new BufferedImage[99][8];
 
 	static {
 		player();
@@ -23,15 +23,15 @@ public class Sprites {
 		BufferedImage image = Tools.getImage("res\\sprites\\animations.png");
 
 		
-		Sprites.tiles[0] = loadSet(image, 0, 8); // Water 1
-		Sprites.tiles[2] = loadSet(image, 2, 5); // Flowers
-		Sprites.tiles[4] = loadSet(image, 4, 4); // grass
-		Sprites.tiles[6] = loadSet(image, 6, 8); // Water 2
-		Sprites.tiles[7] = loadSet(image, 7, 8); // Water 3
-		Sprites.tiles[8] = loadSet(image, 8, 8); // Water 4
-		Sprites.tiles[9] = loadSet(image, 9, 8); // Water 5
-		Sprites.tiles[10] = loadSet(image, 10, 8); // Water 6
-		Sprites.tiles[11] = loadSet(image, 11, 8); // Water 7
+		loadSet(image, 0, 8); // Water 1
+		loadSet(image, 2, 5); // Flowers
+		loadSet(image, 4, 4); // grass
+		loadSet(image, 6, 8); // Water 2
+		loadSet(image, 7, 8); // Water 3
+		loadSet(image, 8, 8); // Water 4
+		loadSet(image, 9, 8); // Water 5
+		loadSet(image, 10, 8); // Water 6
+		loadSet(image, 11, 8); // Water 7
 
 	}
 
@@ -42,6 +42,9 @@ public class Sprites {
 			tiles[i] = image.getSubimage(x, y*16, 16, 16);
 			x += 17;
 		}
+		
+		Sprites.tiles[y] = tiles;
+		
 		return tiles;
 	}
 
