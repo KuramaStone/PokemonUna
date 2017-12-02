@@ -48,6 +48,7 @@ public class Player extends Entity {
 		move();
 		checkArea();
 		mode %= 3;
+		
 	}
 
 	private void checkArea() {
@@ -185,6 +186,7 @@ public class Player extends Entity {
 		direction = d;
 
 		if(!canPlayerMove()) {
+			
 			return;
 		}
 		movement = isRunning ? 4 : 8;

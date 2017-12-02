@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 
 import una.toolbox.ClipboardImage;
 import una.toolbox.InputHandler;
+import una.toolbox.PokeTools;
 import una.world.Screen;
 
 public class PokeLoop {
@@ -44,6 +45,7 @@ public class PokeLoop {
 	}
 
 	public void init() {
+		PokeTools.init();
 		frame.setTitle("Pokemon Una");
 		frame.setSize(WIDTH, HEIGHT);
 		frame.setLocationRelativeTo(null);

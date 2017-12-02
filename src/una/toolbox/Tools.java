@@ -11,7 +11,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -24,9 +26,13 @@ import una.world.PokeArea.AreaData;
 import una.world.Screen;
 
 public class Tools {
+	
+	public static List<Integer> jumpIDs = new ArrayList<>();
 
 	static {
 		loadCharacters();
+		
+		jumpIDs.addAll(Arrays.asList(2242, 2478, 1770, 2183, 2301, 1829, 1711, 2301, 2183, 1829, 1956, 3483, 1897, 1838, 954, 1779));
 	}
 
 	public static void loadGame(int save, Player player, Screen screen) throws IOException {

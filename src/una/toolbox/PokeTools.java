@@ -15,13 +15,19 @@ public class PokeTools {
 	
 	private static Random rnd = new Random();
 
-	private static BufferedImage[] images = { Tools.getImage("res\\sprites\\pokemon_back_1.png"),
-			Tools.getImage("res\\sprites\\pokemon_front_1.png"), Tools.getImage("res\\sprites\\shiny_pokemon_back_1.png"),
-			Tools.getImage("res\\sprites\\shiny_pokemon_front_1.png") };
+	private static BufferedImage[] images;
 
 	private static Map<Integer, BufferedImage[]> pokemonSprites = new HashMap<>();
 	private static Map<Integer, int[]> pokemonStats = new HashMap<>();
 	private static Map<Integer, String> pokemonNames = new HashMap<>();
+	
+	public static void init() {
+		images = new BufferedImage[4];
+		images[0] = Tools.getImage("res\\sprites\\pokemon_back_1.png");
+		images[1] = Tools.getImage("res\\sprites\\pokemon_front_1.png");
+		images[2] = Tools.getImage("res\\sprites\\shiny_pokemon_back_1.png");
+		images[3] = Tools.getImage("res\\sprites\\shiny_pokemon_front_1.png");
+	}
 
 	public static BufferedImage[] loadSprites(int id) {
 		if(pokemonSprites.containsKey(id))

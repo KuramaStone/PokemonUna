@@ -64,7 +64,7 @@ public class Tile {
 	public BufferedImage getImage() {
 		BufferedImage image = animated ? tiles[ani] : Tiles.getImage(tileID);
 		
-		if(animated && tick % (isWater() ? 10 : 5) == 0) {
+		if(animated && tick % 10 == 0) {
 			ani++;
 			ani %= tiles.length;
 		}
