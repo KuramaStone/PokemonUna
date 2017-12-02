@@ -4,9 +4,11 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,17 +16,70 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import una.entity.Player;
 import una.pokemon.Encounter;
 import una.tiles.Tile;
 import una.world.PokeArea;
 import una.world.PokeArea.AreaData;
+import una.world.Screen;
 
 public class Tools {
 
-	// private static Random rnd = new Random();
-
 	static {
 		loadCharacters();
+	}
+
+	public static void loadGame(int save, Player player, Screen screen) throws IOException {
+		File file = new File("res\\saves\\save-" + save + ".sav");
+		System.out.println(file.exists());
+		if(!file.exists())
+			throw new FileNotFoundException("File '" + file.getName() + "' not found...");
+		FileReader fr = new FileReader(file);
+		BufferedReader br = new BufferedReader(fr);
+
+		String[] lines = new String[256];
+		int i = 0;
+
+		String line;
+		while((line = br.readLine()) != null) {
+			lines[i++] = line;
+		}
+
+		String[] line1 = lines[0].split(" ");
+		int xOffset = parse(line1[0]);
+		int yOffset = parse(line1[1]);
+		int direction = parse(line1[2]);
+
+		String line2 = lines[1];
+		int areaID = parse(line2);
+
+		screen.xOffset = xOffset;
+		screen.yOffset = yOffset;
+		screen.setArea(areaID);
+
+		player.setDirection(direction);
+
+		br.close();
+	}
+
+	public static void saveGame(int save, Player player, Screen screen) throws IOException {
+		FileWriter fw = new FileWriter("res\\saves\\save-" + save + ".sav");
+		BufferedWriter bw = new BufferedWriter(fw);
+
+		write(bw, (screen.xOffset / 32) * 32, (screen.yOffset / 32) * 32, player.getDirection());
+		write(bw, screen.currentArea.getAreaID());
+
+		bw.close();
+
+	}
+
+	private static void write(BufferedWriter bw, Object... objects) throws IOException {
+		String splitter = " ";
+		String line = "";
+		for(Object object : objects)
+			line += object.toString() + splitter;
+		bw.write(line.substring(0, line.length() - splitter.length()));
+		bw.newLine();
 	}
 
 	public static String getAreaSrc(int areaID) {
@@ -151,82 +206,6 @@ public class Tools {
 		return conn;
 	}
 
-	public static int[] loadStats(int id) {
-		int[] stats = new int[6];
-		int i = 0;
-		try {
-			FileReader fr = new FileReader("res\\data\\pokemon_stats.txt");
-			BufferedReader br = new BufferedReader(fr);
-
-			String line;
-			while((line = br.readLine()) != null) {
-				if(line.startsWith("##"))
-					continue;
-				String[] data = line.split(",");
-				int dataID = Integer.parseInt(data[0]);
-
-				if(id == dataID) {
-					stats[i++] = Integer.parseInt(data[2]);
-				}
-			}
-			br.close();
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
-
-		return stats;
-	}
-
-	public static String loadTrueName(int id) {
-		try {
-			FileReader fr = new FileReader("res\\data\\pokemon_names.txt");
-			@SuppressWarnings("resource")
-			BufferedReader br = new BufferedReader(fr);
-
-			String line;
-			while((line = br.readLine()) != null) {
-				if(line.startsWith("##"))
-					continue;
-				String[] data = line.split(",");
-				int dataID = Integer.parseInt(data[0]);
-
-				if(id == dataID) {
-					int lang = Integer.parseInt(data[1]);
-					if(lang == 9) {
-						return data[2];
-					}
-				}
-			}
-
-			br.close();
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
-
-		return null;
-	}
-
-	private static BufferedImage[] images = { getImage("res\\sprites\\pokemon_back_1.png"),
-			getImage("res\\sprites\\pokemon_front_1.png"), getImage("res\\sprites\\shiny_pokemon_back_1.png"),
-			getImage("res\\sprites\\shiny_pokemon_front_1.png") };
-
-	public static BufferedImage[] loadSprites(int id) {
-		id--;
-		BufferedImage[] sprites = new BufferedImage[4];
-
-		int x = id % 31;
-		int y = id / 31;
-
-		sprites[0] = images[0].getSubimage(x * 96, y * 96, 96, 96);
-		sprites[1] = images[1].getSubimage(x * 80, y * 80, 80, 80);
-		sprites[2] = images[2].getSubimage(x * 96, y * 96, 96, 96);
-		sprites[3] = images[3].getSubimage(x * 80, y * 80, 80, 80);
-
-		return sprites;
-	}
-
 	public static ArrayList<Encounter> loadEncounters(int areaID) {
 		ArrayList<Encounter> encounters = new ArrayList<>();
 		try {
@@ -338,23 +317,32 @@ public class Tools {
 		else {
 			switch(s) {
 				case "." :
-					id = 52; break;
+					id = 52;
+					break;
 				case "," :
-					id = 53; break;
+					id = 53;
+					break;
 				case "!" :
-					id = 54; break;
+					id = 54;
+					break;
 				case "?" :
-					id = 55; break;
+					id = 55;
+					break;
 				case "/" :
-					id = 56; break;
+					id = 56;
+					break;
 				case "~" :
-					id = 57; break;
+					id = 57;
+					break;
 				case "`" :
-					id = 58; break;
+					id = 58;
+					break;
 				case "&" :
-					id = 59; break;
+					id = 59;
+					break;
 				case "*" :
-					id = 60; break;
+					id = 60;
+					break;
 			}
 		}
 

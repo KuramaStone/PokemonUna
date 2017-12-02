@@ -3,6 +3,7 @@ package una.world;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 
 import una.battle.Battle;
 import una.engine.PokeLoop;
@@ -41,9 +42,16 @@ public class Screen {
 		player = new Player(loop, this);
 		tileR = new TileRenderer(this);
 		textR = new TextRenderer();
-		textR.addText(0, 10, 10, "Hello World!?/.,&*");
+//		textR.addText(0, 10, 10, "Hello World!?/.,&*");
 
-		setArea(62);
+		try {
+			Tools.loadGame(0, player, this);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("No save data found...");
+			setArea(62);
+		}
 	}
 
 	public void setArea(int id) {
@@ -108,6 +116,15 @@ public class Screen {
 
 	public void addYOffset(int offset) {
 		yOffset += offset;
+	}
+
+	public void saveGame() {
+		try {
+			Tools.saveGame(0, player, this);
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

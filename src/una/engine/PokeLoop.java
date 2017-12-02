@@ -3,6 +3,8 @@ package una.engine;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Insets;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -46,7 +48,14 @@ public class PokeLoop {
 		frame.setSize(WIDTH, HEIGHT);
 		frame.setLocationRelativeTo(null);
 		frame.setResizable(false);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent windowEvent) {
+				screen.saveGame();
+				running = false;
+			}
+		});
 		frame.setVisible(true);
 		backBuffer = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 		insets = frame.getInsets();
@@ -75,7 +84,6 @@ public class PokeLoop {
 				render();
 				
 				if(lastFPS + 1000 <= now) {
-					System.out.println(ticks);
 					framesPerSecond = ticks;
 					lastFPS = now;
 					ticks = 0;

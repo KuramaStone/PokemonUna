@@ -313,4 +313,12 @@ public class Player extends Entity {
 		}
 	}
 
+	public void setDirection(int direction) {
+		this.direction = direction;
+	}
+
+	public int	 getDirection() {
+		return direction;
+	}
+
 }
