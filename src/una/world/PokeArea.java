@@ -7,6 +7,7 @@ import java.util.Map;
 
 import una.pokemon.Encounter;
 import una.tiles.Tile;
+import una.toolbox.Position;
 import una.toolbox.Tools;
 
 public class PokeArea {
@@ -116,6 +117,10 @@ public class PokeArea {
 
 	public Tile getTile(int x, int y) {
 		return data.tilemap.get(new Point(x, y));
+	}
+
+	public Tile getTile(Position position) {
+		return getTile(position.getX(), position.getY());
 	}
 
 }

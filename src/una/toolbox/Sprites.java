@@ -14,6 +14,8 @@ public class Sprites {
 	// [tile][tiles]
 	public static BufferedImage[][] tiles = new BufferedImage[99][8];
 
+	public static BufferedImage shadow;
+
 	static {
 		player();
 		tiles();
@@ -32,6 +34,7 @@ public class Sprites {
 		loadSet(image, 9, 8); // Water 5
 		loadSet(image, 10, 8); // Water 6
 		loadSet(image, 11, 8); // Water 7
+		loadSet(image, 12, 3); // Jumping dust
 
 	}
 
@@ -61,6 +64,8 @@ public class Sprites {
 				playerRun[mode - 3][direction] = image.getSubimage(mode * 16, direction * 20, 16, 20);
 			}
 		}
+		
+		shadow = image.getSubimage(0, 80, 16, 20);
 	}
 
 }

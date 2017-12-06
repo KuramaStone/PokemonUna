@@ -11,9 +11,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -26,13 +24,13 @@ import una.world.PokeArea.AreaData;
 import una.world.Screen;
 
 public class Tools {
-	
-	public static List<Integer> jumpIDs = new ArrayList<>();
+
+	private static Map<Integer, BufferedImage> characters;
+
+	private static BufferedImage battleBackgrounds = getImage("res\\sprites\\battle\\backgrounds.png");
 
 	static {
 		loadCharacters();
-		
-		jumpIDs.addAll(Arrays.asList(2242, 2478, 1770, 2183, 2301, 1829, 1711, 2301, 2183, 1829, 1956, 3483, 1897, 1838, 954, 1779));
 	}
 
 	public static void loadGame(int save, Player player, Screen screen) throws IOException {
@@ -246,8 +244,6 @@ public class Tools {
 		return encounters;
 	}
 
-	private static BufferedImage battleBackgrounds = getImage("res\\sprites\\battle\\backgrounds.png");
-
 	public static BufferedImage loadBackground(int background) {
 		if(background > 9 || background < 0) {
 			background = 1;
@@ -258,8 +254,6 @@ public class Tools {
 
 		return battleBackgrounds.getSubimage(x, y, 240, 112);
 	}
-
-	private static Map<Integer, BufferedImage> characters;
 
 	public static BufferedImage getCharacter(Integer i) {
 		return characters.get(i);

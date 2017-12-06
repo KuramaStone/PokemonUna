@@ -75,6 +75,10 @@ public class Tile {
 		return image;
 	}
 	
+	public boolean isCliff() {
+		return Tiles.isCliff(tileID);
+	}
+	
 	public boolean isGrass() {
 		return tileID == 1947;
 	}

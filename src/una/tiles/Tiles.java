@@ -3,7 +3,10 @@ package una.tiles;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -16,6 +19,33 @@ public class Tiles {
 	
 	private static Map<Integer, BufferedImage> tileIDsInt = new HashMap<>();
 	private static Map<BufferedImage, Integer> tileIDsBuf = new HashMap<>();
+
+	private static List<Integer> cliffDown = new ArrayList<>();
+	private static List<Integer> cliffLeft = new ArrayList<>(), cliffRight = new ArrayList<>();
+	
+	static {
+		cliffDown.addAll(Arrays.asList(1711, 2419, 2242, 2478, 1770, 1829, 2183, 2301, 3370, 1956, 3483, 1897));
+		
+		cliffLeft.addAll(Arrays.asList(1779, 954));
+		
+		cliffRight.addAll(Arrays.asList(1838));
+	}
+	
+	public static boolean isCliff(int id) {
+		return isDownCliff(id) || isLeftCliff(id) || isRightCliff(id);
+	}
+	
+	public static boolean isLeftCliff(int id) {
+		return cliffLeft.contains(id);
+	}
+	
+	public static boolean isRightCliff(int id) {
+		return cliffRight.contains(id);
+	}
+
+	public static boolean isDownCliff(int id) {
+		return cliffDown.contains(id);
+	}
 	
 	public static BufferedImage getImage(int id) {
 		return tileIDsInt.get(id);
