@@ -36,7 +36,7 @@ public class Player extends Entity {
 	private boolean leftAnimation;
 	private int jumping, dust, movement, moveDelay;
 
-	private GrassAnimation[] grass = new GrassAnimation[6];
+	private GrassAnimation[] grass = new GrassAnimation[10];
 
 	public Player(PokeLoop loop, Screen screen) {
 		super(loop, screen);
@@ -270,7 +270,15 @@ public class Player extends Entity {
 				addGrassAni(x, y);
 			}
 		}
+		
+		renderPlayerHead(g);
 
+	}
+	
+	private void renderPlayerHead(Graphics g) {
+		int y = (int) (jumping > 0 ? 24 * (1 - ((double) Math.abs(jumping - 8) / 8)) : 0);
+		BufferedImage image = animation[mode][direction];
+		g.drawImage(image.getSubimage(0, 0, image.getWidth(), 15), PokeLoop.WIDTH / 2 - 16, PokeLoop.HEIGHT / 2 - 25 - y, 32, 30, null);
 	}
 
 	private void renderGrass(Tile tile, Graphics g) {
@@ -335,11 +343,15 @@ public class Player extends Entity {
 		}
 
 		public void playGrassAnimation(Graphics g, Screen screen) {
-			if(ticks % 5 == 0 && grassTick < 3) {
+			if(ticks % 6 == 0 && grassTick < 3) {
 				grassTick++;
 			}
+			
+			int ax = x + screen.xOffset;
+			int ay = y + screen.yOffset;
 
-			g.drawImage(Sprites.tiles[4][grassTick], x + screen.xOffset, y + screen.yOffset, 32, 32, null);
+			BufferedImage image = (224 == ax && 224 == ay) ? Sprites.tiles[4][grassTick] : Sprites.tiles[12][Math.min(grassTick, 2)];
+			g.drawImage(image, ax, ay, 32, 32, null);
 		}
 	}
 

@@ -8,9 +8,11 @@ import java.io.IOException;
 import una.battle.Battle;
 import una.engine.PokeLoop;
 import una.engine.TileRenderer;
+import una.entity.NPC;
 import una.entity.Player;
 import una.font.TextRenderer;
 import una.toolbox.InputHandler;
+import una.toolbox.Position;
 import una.toolbox.Tools;
 
 public class Screen {
@@ -60,8 +62,12 @@ public class Screen {
 			specAreas = Tools.loadConnections(id);
 		}
 	}
+	
+	private NPC npc;
 
 	public void render(Graphics g) {
+		if(npc == null)
+			npc = new NPC(loop, this, 7, new Position(8, 8));
 		if(battle == null) {
 			for(PokeArea spec : specAreas) {
 				if(spec != null) {
@@ -82,7 +88,22 @@ public class Screen {
 			g.setColor(new Color(0, 0, 0, (int) (128 * (ssDelay / 10d))));
 			g.fillRect(0, 0, PokeLoop.WIDTH, PokeLoop.HEIGHT);
 		}
+		npc.render(g);
 	}
+	
+//	private void drawGrid(Graphics g) {
+//		g.setColor(Color.RED);
+//		for(int x = 0; x <= currentArea.getWidth(); x++) {
+//			int lx = x * 32 + xOffset;
+//			int ly = yOffset;
+//			g.drawLine(lx, ly, lx, ly + ((currentArea.getHeight()) * 32));
+//		}
+//		for(int y = 0; y <= currentArea.getHeight(); y++) {
+//			int lx = xOffset;
+//			int ly = y * 32 + yOffset;
+//			g.drawLine(lx, ly, lx + ((currentArea.getWidth()) * 32), ly);
+//		}
+//	}
 	
 	private int ssDelay;
 

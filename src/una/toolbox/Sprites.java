@@ -16,15 +16,17 @@ public class Sprites {
 
 	public static BufferedImage shadow;
 
+	public static BufferedImage[] NPCS = new BufferedImage[605];
+
 	static {
 		player();
+		npcs();
 		tiles();
 	}
 
 	private static void tiles() {
 		BufferedImage image = Tools.getImage("res\\sprites\\animations.png");
 
-		
 		loadSet(image, 0, 8); // Water 1
 		loadSet(image, 2, 5); // Flowers
 		loadSet(image, 4, 4); // grass
@@ -35,19 +37,25 @@ public class Sprites {
 		loadSet(image, 10, 8); // Water 6
 		loadSet(image, 11, 8); // Water 7
 		loadSet(image, 12, 3); // Jumping dust
+		loadSet(image, 13, 3); // Grass particles
 
+	}
+
+	private static void npcs() {
+		ImgSorter img = new ImgSorter();
+		NPCS = img.loadImages("C:\\Users\\User\\Documents\\Una\\Pokemon Una\\res\\sprites\\npcs.png");
 	}
 
 	private static BufferedImage[] loadSet(BufferedImage image, int y, int length) {
 		BufferedImage[] tiles = new BufferedImage[length];
 		int x = 0;
 		for(int i = 0; i < length; i++) {
-			tiles[i] = image.getSubimage(x, y*16, 16, 16);
+			tiles[i] = image.getSubimage(x, y * 16, 16, 16);
 			x += 17;
 		}
-		
+
 		Sprites.tiles[y] = tiles;
-		
+
 		return tiles;
 	}
 
@@ -64,7 +72,7 @@ public class Sprites {
 				playerRun[mode - 3][direction] = image.getSubimage(mode * 16, direction * 20, 16, 20);
 			}
 		}
-		
+
 		shadow = image.getSubimage(0, 80, 16, 20);
 	}
 
