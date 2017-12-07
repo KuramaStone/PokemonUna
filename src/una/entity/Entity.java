@@ -13,6 +13,8 @@ public abstract class Entity {
 
 	protected final Random rnd;
 
+	protected int ticks;
+
 	public Entity(PokeLoop loop, Screen screen) {
 		this.loop = loop;
 		this.screen = screen;
@@ -20,6 +22,8 @@ public abstract class Entity {
 	}
 
 	public void tick() {
+		ticks++;
+		ticks %= 30;
 	}
 
 	public void render(Graphics g) {

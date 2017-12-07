@@ -16,7 +16,7 @@ public class Sprites {
 
 	public static BufferedImage shadow;
 
-	public static BufferedImage[] NPCS = new BufferedImage[605];
+	public static BufferedImage[] NPCS = new BufferedImage[1000];
 
 	static {
 		player();

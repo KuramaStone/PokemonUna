@@ -66,8 +66,6 @@ public class Screen {
 	private NPC npc;
 
 	public void render(Graphics g) {
-		if(npc == null)
-			npc = new NPC(loop, this, 7, new Position(8, 8));
 		if(battle == null) {
 			for(PokeArea spec : specAreas) {
 				if(spec != null) {
@@ -108,8 +106,14 @@ public class Screen {
 	private int ssDelay;
 
 	public void tick() {
+		if(npc == null) {
+			npc = new NPC(loop, this, 8, new Position(8*32, 8*32), currentArea);
+			npc.setMovement(32);
+		}
+		
 		if(battle == null) {
 			player.tick();
+			npc.tick();
 		}
 		
 		if(input.isKeyDown(KeyEvent.VK_SPACE)) {

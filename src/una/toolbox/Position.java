@@ -9,6 +9,14 @@ public class Position {
 		this.y = y;
 	}
 	
+	public void addX(int i) {
+		x += i;
+	}
+	
+	public void addY(int i) {
+		y += i;
+	}
+	
 	public void subtract(Position a) {
 		this.x -= a.x;
 		this.y -= a.y;

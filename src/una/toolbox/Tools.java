@@ -18,6 +18,8 @@ import javax.imageio.ImageIO;
 
 import una.entity.Player;
 import una.pokemon.Encounter;
+import una.script.Command;
+import una.script.Command.CommandType;
 import una.tiles.Tile;
 import una.world.PokeArea;
 import una.world.PokeArea.AreaData;
@@ -414,6 +416,75 @@ public class Tools {
 
 	private static boolean isNumeric(String s) {
 		return s != null && s.matches("[-+]?\\d*\\.?\\d+");
+	}
+
+	private static final File scriptFile = new File("res\\data\\scriptNPC.txt");
+
+	public static Command[] loadScript(int id) {
+		Command[] commands = new Command[128];
+		int count = 0;
+		try {
+			FileReader fr = new FileReader(scriptFile);
+			BufferedReader br = new BufferedReader(fr);
+			
+			boolean foundID = false;
+			String line;
+			while((line = br.readLine()) != null) {
+				if(!foundID) {
+					if(line.startsWith("#")) {
+						if(isNumeric(line.substring(1, line.length()))) {
+							Integer integer = Integer.parseInt(line.substring(1, line.length()));
+							if(integer == id) {
+								foundID = true;
+							}
+						}
+					}
+				}
+				else {
+					if(!line.startsWith("#") && line.length() > 0) {
+						
+						String[] args = line.split(" ");
+						
+						CommandType type = CommandType.fromName(args[0]);
+						if(type != null) {
+							if(type.givesText()) {
+								commands[count++] = new Command(id, combineArgs(" ", args, 1));
+							}
+							else {
+								commands[count++] = new Command(id, toIntegerArray(args, 1));
+							}
+						}
+					}
+				}
+			}
+			
+			br.close();
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return commands;
+	}
+	
+	private static int[] toIntegerArray(String[] args, int i) {
+		int[] array = new int[args.length-i];
+		for(int j = i; j < array.length; j++)
+			array[j] = Integer.parseInt(args[j]);
+		return array;
+	}
+
+	private static String combineArgs(String splitter, String[] args, int offset) {
+		String string = "";
+		for(int i = offset; i < args.length; i++) {
+			String arg = args[i];
+			if(i != args.length)
+				string += arg + splitter;
+			else
+				string += arg;
+		}
+		
+		return string;
 	}
 
 }

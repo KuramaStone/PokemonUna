@@ -30,10 +30,9 @@ public class Player extends Entity {
 	private Pokemon pokemon;
 
 	// Animation movement
-	private static int ticks;
 	private boolean isRunning;
 
-	private boolean leftAnimation;
+	private boolean leftAnimation, doneMoving;
 	private int jumping, dust, movement, moveDelay;
 
 	private GrassAnimation[] grass = new GrassAnimation[10];
@@ -50,9 +49,7 @@ public class Player extends Entity {
 		checkArea();
 		mode %= 3;
 
-		ticks++;
-		ticks %= 30;
-
+		super.tick();
 		// Tile tile = area.getTile(getMapX(), getMapY());
 		// System.out.println(tile == null ? null : tile.getTileID());
 	}
@@ -81,8 +78,6 @@ public class Player extends Entity {
 		}
 
 	}
-
-	private boolean doneMoving;
 
 	private void move() {
 		if(moveDelay > 0) {
@@ -292,7 +287,7 @@ public class Player extends Entity {
 					grass[i] = null;
 				}
 				else {
-					ga.playGrassAnimation(g, screen);
+					ga.playGrassAnimation(g, screen, ticks);
 				}
 			}
 		}
@@ -308,8 +303,8 @@ public class Player extends Entity {
 	}
 
 	private void renderPlayer(Graphics g) {
-		int y = (int) (jumping > 0 ? 24 * (1 - ((double) Math.abs(jumping - 8) / 8)) : 0);
-		g.drawImage(animation[mode][direction], PokeLoop.WIDTH / 2 - 16, PokeLoop.HEIGHT / 2 - 25 - y, 32, 40, null);
+		int jumpHeight = (int) (jumping > 0 ? 24 * (1 - ((double) Math.abs(jumping - 8) / 8)) : 0);
+		g.drawImage(animation[mode][direction], PokeLoop.WIDTH / 2 - 16, PokeLoop.HEIGHT / 2 - 25 - jumpHeight, 32, 40, null);
 
 		if(jumping >= 0) {
 			if(jumping == 0) {
@@ -342,7 +337,7 @@ public class Player extends Entity {
 			return this.x == x && this.y == y;
 		}
 
-		public void playGrassAnimation(Graphics g, Screen screen) {
+		public void playGrassAnimation(Graphics g, Screen screen, int ticks) {
 			if(ticks % 6 == 0 && grassTick < 3) {
 				grassTick++;
 			}

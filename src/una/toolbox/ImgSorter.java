@@ -5,13 +5,14 @@ import java.awt.image.BufferedImage;
 public class ImgSorter {
 
 	public BufferedImage[] loadImages(String path) {
-		BufferedImage[] images = new BufferedImage[605];
+		BufferedImage[] images = new BufferedImage[1000];
 		BufferedImage image = Tools.getImage(path);
 
 		int count = 0;
 		int yOffset = 0;
 
 		int lastX = 0;
+		int j = 0;
 		while(yOffset != 11) {
 			for(int x = 0; x < image.getWidth(); x++) {
 				boolean foundPixel = check(image, x);
@@ -21,9 +22,15 @@ public class ImgSorter {
 					if(!check(image, x+1))
 						break;
 					
-					System.out.println(count);
 					images[count++] = image.getSubimage(lastX, yOffset * 23, x - lastX, 20);
+					
+					if(j == 2) {
+						images[count++] = flip(images[count-2]);
+						j = 0;
+					}
+					
 					lastX = x + 1;
+					j++;
 				}
 			}
 			yOffset++;
@@ -31,6 +38,18 @@ public class ImgSorter {
 		}
 
 		return images;
+	}
+
+	private BufferedImage flip(BufferedImage bi) {
+		BufferedImage image = bi.getSubimage(0, 0, bi.getWidth(), bi.getHeight());
+		
+		for(int x = image.getWidth()-1; x >= 0; x--) {
+			for(int y = 0; y < image.getHeight(); y++) {
+				image.setRGB(x, y, bi.getRGB(x, y));
+			}
+		}
+		
+		return null;
 	}
 
 	private boolean check(BufferedImage image, int x) {
